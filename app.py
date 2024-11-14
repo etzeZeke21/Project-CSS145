@@ -14,8 +14,8 @@ st.set_page_config(
     initial_sidebar_state="expanded")
 
 alt.themes.enable("dark")
-
 #######################
+
 # Initialize page_selection in session state if not already set
 if 'page_selection' not in st.session_state:
     st.session_state.page_selection = 'about'  # Default page
@@ -118,72 +118,64 @@ if st.session_state.page_selection == "about":
 elif st.session_state.page_selection == "dataset":
     st.header("📊 Dataset")
 
-    st.write("""
-    The Steam game reviews dataset includes data from several popular video games such as Arma 3, Counter-Strike, Dota 2, Grand Theft Auto V, and others. 
-    These datasets, collected from Steam user reviews, provide valuable insights into player sentiment and game performance. 
-    The dataset includes various features, such as review sentiment (positive or negative), review text, and user-related information.
-    """)
+    st.write(
+    """
+    The **Steam Game Reviews** dataset contains detailed information on thousands of game reviews collected from Steam. This dataset includes variables such as gameplay hours, social engagement metrics, user ratings, and review helpfulness scores. It is useful for analyzing player behaviors, understanding gaming preferences, and measuring engagement.
+    
+    For each review, various features are measured, including **total_game_hours_last_two_weeks** (hours played in the last two weeks), **num_reviews** (total number of reviews written by the user), **num_friends** (number of friends the user has), and **found_helpful_percentage** (percentage of users who found the review helpful). This data offers insights into both game popularity and player interaction on Steam. The dataset was sourced from a GitHub repository dedicated to Steam game reviews.
+    
+    **Content**  
+    The dataset contains approximately 80,000 rows with attributes related to gameplay activity, review metrics, and social engagement.
+    """
+)
 
-    st.subheader("Content")
-    st.write("""
-    The combined dataset consists of several JSONL files from various games, each containing player reviews, their sentiment, and game-related details.
-    These games include:
+    st.write("`Link:` [Steam Reviews Dataset on GitHub](https://github.com/mulhod/steam_reviews)")
 
-    - **Arma 3**
-    - **Counter-Strike**
-    - **Counter-Strike: Global Offensive**
-    - **Dota 2**
-    - **Football Manager 2015**
-    - **Garry's Mod**
-    - **Grand Theft Auto V**
-    - **Sid Meier's Civilization V**
-    - **Team Fortress 2**
-    - **The Elder Scrolls V**
-    - **Warframe**
-    """)
-
-    st.write("Link: [Steam Reviews Dataset on GitHub](https://github.com/mulhod/steam_reviews)")
-
+    # Displaying the dataset as a Data Frame
     st.subheader("Dataset displayed as a Data Frame")
     st.dataframe(combined_df)
 
     # Descriptive Statistics
     st.subheader("Descriptive Statistics")
-    st.write("""
-    The results from `df.describe()` provide some basic insights into the dataset, showing the distribution of numerical features like 
-    review length, helpfulness ratings, and sentiment scores across different games. These statistical summaries help identify trends in 
-    user feedback and highlight any variations between games.
-    """)
-    
-    # Display Descriptive Statistics Table
-    st.dataframe(combined_df.describe())
+    st.write("Here’s a summary of some of the key attributes in the dataset:")
 
-    st.write("""
-    The results from `df.describe()` highlight the distribution of numerical columns like review length and helpfulness score. 
-    For example, the **review length** column averages {:.2f} characters, with a standard deviation of {:.2f}, indicating moderate variation in how long users' reviews are. 
-    **Helpfulness ratings**, on the other hand, have a lower mean of {:.2f} and a larger standard deviation of {:.2f}, suggesting some reviews are much more helpful than others.
-    """.format(
-        combined_df["review_length"].mean(), combined_df["review_length"].std(),
-        combined_df["helpfulness_score"].mean(), combined_df["helpfulness_score"].std()
-    ))
+    # Displaying Descriptive Statistics Table
+    st.dataframe(combined_df.describe()[[
+        "total_game_hours_last_two_weeks", "num_groups", "num_badges", "num_found_funny", 
+        "num_workshop_items", "found_helpful_percentage", "num_voted_helpfulness", "num_found_helpful", 
+        "friend_player_level", "total_game_hours", "num_guides", "num_friends", 
+        "num_screenshots", "num_comments", "num_reviews", "num_games_owned"
+    ]])
 
-    # Calculating min and max values for specific insights
-    min_review_length = combined_df["review_length"].min()
-    max_review_length = combined_df["review_length"].max()
-    min_helpfulness = combined_df["helpfulness_score"].min()
-    max_helpfulness = combined_df["helpfulness_score"].max()
+    # Extracting relevant statistics from the describe() output
+    mean_total_game_hours = combined_df["total_game_hours"].mean()
+    max_total_game_hours = combined_df["total_game_hours"].max()
+    std_total_game_hours = combined_df["total_game_hours"].std()
 
-    # Displaying Minimum and Maximum Value Insights
-    st.write("""
-    Speaking of minimum and maximum values, **review length** ranges from {:.1f} characters up to {:.1f} characters, 
-    and **helpfulness score** ranges from {:.1f} to {:.1f}, indicating significant variability across the dataset.
-    """.format(min_review_length, max_review_length, min_helpfulness, max_helpfulness))
+    mean_num_reviews = combined_df["num_reviews"].mean()
+    std_num_reviews = combined_df["num_reviews"].std()
+    max_num_reviews = combined_df["num_reviews"].max()
 
-    # Displaying Percentile Insights
-    st.write("""
-    The 25th, 50th, and 75th percentiles reveal a general trend in the length and helpfulness of reviews, 
-    suggesting that more detailed and helpful reviews tend to appear as the dataset grows.
-    """)
+    mean_num_friends = combined_df["num_friends"].mean()
+    std_num_friends = combined_df["num_friends"].std()
+
+    mean_num_found_funny = combined_df["num_found_funny"].mean()
+    max_num_found_funny = combined_df["num_found_funny"].max()
+
+    mean_found_helpful_percentage = combined_df["found_helpful_percentage"].mean()
+
+# Writing the paragraph with the statistics
+    st.write(f"""
+The results from `combined_df.describe()` provide valuable insights into player engagement, review activity, and social interaction in the Steam gaming community.
+
+On average, players have spent approximately {mean_total_game_hours:.2f} hours on their games, with a wide range of engagement from 0.0 to {max_total_game_hours:.1f} hours (standard deviation of {std_total_game_hours:.2f}). This suggests that while some players dedicate a significant amount of time to their games, others engage minimally. When it comes to reviews, players have submitted an average of {mean_num_reviews:.2f} reviews, but there is a high variability (standard deviation of {std_num_reviews:.2f}), with the maximum number of reviews reaching {max_num_reviews}. This shows that some users are more active in providing feedback, while others are less engaged.
+
+The social aspect of gaming is also evident, with players having an average of {mean_num_friends:.2f} friends (standard deviation of {std_num_friends:.2f}), demonstrating diverse levels of social engagement. In terms of humor, users have found an average of {mean_num_found_funny:.2f} reviews funny, with a broad range, as the highest number of humorous reviews found is {max_num_found_funny}. This highlights that while some players appreciate humor in reviews, others may not engage with it as much.
+
+Finally, the **found_helpful_percentage**, which averages {mean_found_helpful_percentage:.2f}, shows that players generally find reviews to be helpful, with some reviews being rated as helpful by nearly every player. This indicates that feedback shared on the platform holds significant value within the community.
+
+These insights provide a detailed look at how players engage with games and reviews on Steam.
+""")
 
 # EDA Page
 elif st.session_state.page_selection == "eda":
@@ -193,8 +185,10 @@ elif st.session_state.page_selection == "eda":
     col = st.columns((1.5, 4.5, 2), gap='medium')
 
     # Your content for the EDA page goes here
+
     with col[0]:
         st.markdown('#### Graphs Column 1')
+
 
     with col[1]:
         st.markdown('#### Graphs Column 2')
@@ -257,11 +251,15 @@ if st.session_state.page_selection == "machine_learning":
     plot_tree(dt_classifier, filled=True, feature_names=X_train.columns, class_names=["Setosa", "Versicolor", "Virginica"], ax=ax)
     st.pyplot(fig)
 
+
+
     # Your content for the MACHINE LEARNING page goes here
 
 # Prediction Page
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction")
+
+
 
     # Your content for the PREDICTION page goes here
 
