@@ -296,6 +296,54 @@ elif st.session_state.page_selection == "data_cleaning":
     st.header("🧼 Data Cleaning and Data Pre-processing")
 
     # Your content for the DATA CLEANING / PREPROCESSING page goes here
+     # Load and show initial data
+    st.subheader("Initial Dataset")
+    st.dataframe(combined_df.head())
+
+      # Display initial number of rows
+    st.subheader("Initial DataFrame Statistics")
+    st.write(f"Number of rows before cleaning: {len(df)}")
+
+    # Display data types of columns
+    st.subheader("Column Data Types")
+    st.dataframe(df.dtypes)
+
+    # Display summary statistics
+    st.subheader("Summary Statistics")
+    st.write(df.describe())
+
+    # Display missing values
+    st.subheader("Missing Values")
+    st.write(df.isnull().sum())
+
+    # Display unique values in categorical columns
+    for col in df.select_dtypes(include=['object']):
+        st.subheader(f"Unique values in {col}")
+        st.write(df[col].value_counts())
+
+    # Display data cleaning steps
+    st.subheader("Data Cleaning Steps")
+    st.write("1. Removed null values")
+    st.write("2. Converted 'rating' column to binary (recommended/not recommended)")
+    st.write("3. Downsampled the 'recommended' class to match the number of 'not recommended' reviews")
+    st.write("4. Processed text data using NLTK")
+    st.write("5. Calculated review quality score")
+    st.write("6. Created new features (log playtime, has significant playtime)")
+    st.write("7. Removed rows with missing values in required columns")
+
+    # Display final DataFrame statistics
+    st.subheader("Final DataFrame Statistics")
+    st.write(f"Number of rows after cleaning: {len(df)}")
+
+    # Display sample of cleaned data
+    st.subheader("CLEANED DATA")
+    st.dataframe(df.head())
+
+    # Display summary of cleaning process
+    st.subheader("PROCESS")
+    st.write("The data cleaning process involved several steps to prepare the dataset for analysis.")
+    st.write("We removed null values, converted the rating column to binary, downsampled the recommended class, processed text data using NLTK, calculated a review quality score, created new features, and removed rows with missing values in required columns.")
+    st.write("These steps helped ensure that the dataset was clean, balanced, and ready for analysis.")
 
 # Machine Learning Page
 elif st.session_state.page_selection == "machine_learning":
