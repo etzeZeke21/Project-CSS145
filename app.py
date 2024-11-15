@@ -197,6 +197,13 @@ elif st.session_state.page_selection == "eda":
         ).properties(width=700, height=400)
         st.altair_chart(chart, use_container_width=True)
 
+        #Caption
+        st.write("""
+        **Interpretation:** This graph shows how many hours players have spent on their games. A peak at lower hours would suggest 
+        that many users play only briefly, while a high frequency at higher hours could indicate a subset of dedicated players. 
+        This distribution gives insight into user engagement levels.
+        """)
+
     with col2:
         st.subheader("Helpfulness of Reviews")
         helpful_chart = alt.Chart(combined_df).mark_bar().encode(
@@ -204,6 +211,13 @@ elif st.session_state.page_selection == "eda":
             y='count()'
         ).properties(width=700, height=400)
         st.altair_chart(helpful_chart, use_container_width=True)
+
+        # Caption
+        st.write("""
+        **Interpretation:** This graph shows the percentage of users who found reviews helpful. A high peak at higher percentages 
+        indicates that most reviews are generally seen as useful by the community, while a diverse spread suggests mixed perceptions 
+        of review helpfulness.
+        """)
 
     col3, col4 = st.columns(2, gap='medium')
 
@@ -215,6 +229,12 @@ elif st.session_state.page_selection == "eda":
             y='count()'
         ).properties(width=700, height=400)
         st.altair_chart(review_length_chart, use_container_width=True)
+        # Caption
+        st.write("""
+        **Interpretation:** This graph shows the length of reviews. If most reviews are short, users may prefer giving quick 
+        feedback, whereas longer reviews may indicate more detailed feedback. This analysis helps understand how deeply users engage 
+        in reviews.
+        """)
 
     with col4:
         st.subheader("Social Engagement: Number of Friends vs. Number of Reviews")
@@ -224,6 +244,12 @@ elif st.session_state.page_selection == "eda":
             tooltip=['num_friends', 'num_reviews']
         ).properties(width=700, height=400)
         st.altair_chart(social_engagement_chart, use_container_width=True)
+        # Caption for interpretation
+        st.write("""
+        **Interpretation:** This scatter plot shows the relationship between the number of friends and number of reviews. 
+        A positive trend would suggest that social users are also active reviewers. Outliers may represent users who review a lot 
+        without social engagement or vice versa.
+        """)
 
     from wordcloud import WordCloud
     import matplotlib.pyplot as plt
@@ -233,6 +259,13 @@ elif st.session_state.page_selection == "eda":
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
     st.pyplot(plt)
+
+    # Caption
+    st.write("""
+    **Interpretation:** This word cloud shows frequently mentioned words in reviews. Common words can reveal popular topics or 
+    frequent concerns among players, such as gameplay, performance, or features. Positive or negative words can indicate the 
+    general sentiment.
+    """)
 
 # Data Cleaning Page
 elif st.session_state.page_selection == "data_cleaning":
