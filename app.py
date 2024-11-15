@@ -190,7 +190,6 @@ elif st.session_state.page_selection == "eda":
     col1, col2 = st.columns(2, gap='medium')
 
     with col1:
-        st.markdown('#### Graphs Column 1')
         st.subheader("Distribution of Total Game Hours")
         chart = alt.Chart(combined_df).mark_bar().encode(
             alt.X("total_game_hours", bin=True),
@@ -199,7 +198,6 @@ elif st.session_state.page_selection == "eda":
         st.altair_chart(chart, use_container_width=True)
 
     with col2:
-        st.markdown('#### Graphs Column 2')
         st.subheader("Helpfulness of Reviews")
         helpful_chart = alt.Chart(combined_df).mark_bar().encode(
             alt.X("found_helpful_percentage", bin=True),
@@ -210,7 +208,6 @@ elif st.session_state.page_selection == "eda":
     col3, col4 = st.columns(2, gap='medium')
 
     with col3:
-        st.markdown('#### Graphs Column 3')
         combined_df['review_length'] = combined_df['review'].apply(lambda x: len(str(x)))
         st.subheader("Review Length Analysis")
         review_length_chart = alt.Chart(combined_df).mark_bar().encode(
@@ -228,8 +225,6 @@ elif st.session_state.page_selection == "eda":
         ).properties(width=700, height=400)
         st.altair_chart(social_engagement_chart, use_container_width=True)
 
-    
-    st.markdown('#### Graphs Column 5')
     from wordcloud import WordCloud
     import matplotlib.pyplot as plt
     st.subheader("Word Cloud of Most Common Words in Reviews")
