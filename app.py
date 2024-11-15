@@ -364,7 +364,9 @@ elif st.session_state.page_selection == "prediction":
         ]
 
         df = df_unclean.dropna(subset=['found_helpful_percentage'], inplace=False)
+
         X = df[features].copy()
+
         y = (df['found_helpful_percentage'] >= threshold).astype(int)
 
         X_train, X_test, y_train, y_test = train_test_split(
@@ -383,6 +385,7 @@ elif st.session_state.page_selection == "prediction":
         )
 
         rf_model.fit(X_train_scaled, y_train)
+
         y_pred = rf_model.predict(X_test_scaled)
 
         report = classification_report(y_test, y_pred, output_dict=False)
@@ -392,10 +395,10 @@ elif st.session_state.page_selection == "prediction":
             'importance': rf_model.feature_importances_
         }).sort_values('importance', ascending=False)
 
-        return rf_model, scaler
+        return rf_model, scaler, report, feature_importance
 
     # Train model and scaler using the combined dataset
-    model, scaler = train_helpfulness_classifier(combined_df)
+    model, scaler, report, feature_importance = train_helpfulness_classifier(combined_df)
 
     # User input for new data to predict
     st.subheader("Helpful Review Classification")
@@ -418,6 +421,18 @@ elif st.session_state.page_selection == "prediction":
             st.success("Prediction: The review is likely to be marked as helpful.")
         else:
             st.info("Prediction: The review is less likely to be marked as helpful.")
+    
+    # Checkbox to toggle feature importance graph
+    show_graph = st.checkbox("Show Feature Importance Graph", value=False)
+
+    # Display the feature importance graph if the checkbox is checked
+    if show_graph:
+        st.subheader("Feature Importance for Review Helpfulness Prediction")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(x='importance', y='feature', data=feature_importance, ax=ax)
+        ax.set_title('Feature Importance for Review Helpfulness Prediction')
+        plt.tight_layout()
+        st.pyplot(fig)
 
 # Conclusions Page
 elif st.session_state.page_selection == "conclusion":
@@ -431,10 +446,6 @@ elif st.session_state.page_selection == "conclusion":
     st.subheader("Classification Model")
     st.write("""
      The classification model used the data groups: number of voted helpfulness, number of voted funny, total game hours, and number of comments to try and predict the helpfulness percentage of the review. According to the random forest classification the only data group that had significant impact was number of voted helpfulness, and the other data groups had little to no importance in the helpfulness percentage. Though the classification model still had a high accuracy percentage.
-            """)
-    st.subheader("Time Analysis Model")
-    st.write("""
-    The time analysis model analyzed the trends between the games using the dates when the review was posted and the total game hours of the reviewers.The trends were all decreasing which also points to the fact that these games were released at around 10 years ago so after their initial spike and popularity, the reviews are slowing down. But it is still suprising that even after 5 years they are still getting reviews. The model can be used to try and predict the trends until now and it would show that the reviews are on a steady decline from its initial release.
             """)
     st.subheader("Time Analysis Model")
     st.write("""
