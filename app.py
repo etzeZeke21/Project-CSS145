@@ -6,6 +6,7 @@ import altair as alt
 import numpy as np
 import requests
 
+
 #######################
 # Page configuration
 st.set_page_config(
@@ -181,20 +182,62 @@ These insights provide a detailed look at how players engage with games and revi
 elif st.session_state.page_selection == "eda":
     st.header("📈 Exploratory Data Analysis (EDA)")
 
+    st.subheader("Dataset Summary")
+    st.write("Here’s a summary of the key features in the dataset:")
+    st.dataframe(combined_df.describe())
 
-    col = st.columns((1.5, 4.5, 2), gap='medium')
+    # Create the first row with columns 1 and 2
+    col1, col2 = st.columns(2, gap='medium')
 
-    # Your content for the EDA page goes here
-
-    with col[0]:
+    with col1:
         st.markdown('#### Graphs Column 1')
+        st.subheader("Distribution of Total Game Hours")
+        chart = alt.Chart(combined_df).mark_bar().encode(
+            alt.X("total_game_hours", bin=True),
+            y='count()'
+        ).properties(width=700, height=400)
+        st.altair_chart(chart, use_container_width=True)
 
-
-    with col[1]:
+    with col2:
         st.markdown('#### Graphs Column 2')
-        
-    with col[2]:
+        st.subheader("Helpfulness of Reviews")
+        helpful_chart = alt.Chart(combined_df).mark_bar().encode(
+            alt.X("found_helpful_percentage", bin=True),
+            y='count()'
+        ).properties(width=700, height=400)
+        st.altair_chart(helpful_chart, use_container_width=True)
+
+    col3, col4 = st.columns(2, gap='medium')
+
+    with col3:
         st.markdown('#### Graphs Column 3')
+        combined_df['review_length'] = combined_df['review'].apply(lambda x: len(str(x)))
+        st.subheader("Review Length Analysis")
+        review_length_chart = alt.Chart(combined_df).mark_bar().encode(
+            alt.X("review_length", bin=True),
+            y='count()'
+        ).properties(width=700, height=400)
+        st.altair_chart(review_length_chart, use_container_width=True)
+
+    with col4:
+        st.subheader("Social Engagement: Number of Friends vs. Number of Reviews")
+        social_engagement_chart = alt.Chart(combined_df).mark_circle().encode(
+            x='num_friends',
+            y='num_reviews',
+            tooltip=['num_friends', 'num_reviews']
+        ).properties(width=700, height=400)
+        st.altair_chart(social_engagement_chart, use_container_width=True)
+
+    
+    st.markdown('#### Graphs Column 5')
+    from wordcloud import WordCloud
+    import matplotlib.pyplot as plt
+    st.subheader("Word Cloud of Most Common Words in Reviews")
+    text = ' '.join(review for review in combined_df.review)
+    wordcloud = WordCloud(background_color="white").generate(text)
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    st.pyplot(plt)
 
 # Data Cleaning Page
 elif st.session_state.page_selection == "data_cleaning":
