@@ -119,7 +119,7 @@ if st.session_state.page_selection == "about":
     
     st.write("The dataset provides reviews from the Steam website across 11 games namely: Arma 3, Counter Strike, Counter Strike Global Offensive, Dota 2, Football Manager 2015, Garry’s Mod, Grand Theft Auto V, Sid Meiers Civilization 5, Team Fortress 2, The Elder Scrolls V, and Warframe. Each review comes alongside numerous pieces of data, including the number of people who marked the review helpful, the number of people who marked the review funny, the number of friends the reviewer has on the site, etc. One of the more important pieces of data, however, is the number of hours that the reviewer played the game that they are reviewing.\n\n Successfully created the following:")
     
-    st.markdown("- A sentimental analysis model that will analyze a review and decide if the review is reocmmmended or not recommended, using the review text.")
+    st.markdown("- A sentimental analysis model that will analyze a review and decide if the review is recommmended or not recommended, using the review text.")
     st.markdown("- A helpful review classification that can predict the helpfulness score, using the number of voted helpfulness, number of voted funny, total game hours, achievement progress, and number of comments.")
     st.markdown("- A time series analysis that uses the date posted and total game hours to track how the sentiment of reviews or helpfulness score changes over time.")
 
