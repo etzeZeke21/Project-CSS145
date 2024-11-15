@@ -5,6 +5,12 @@ import pandas as pd
 import altair as alt
 import numpy as np
 import requests
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 #######################
@@ -346,10 +352,72 @@ if st.session_state.page_selection == "machine_learning":
 # Prediction Page
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction")
+    
+    # Define model training function
+    def train_helpfulness_classifier(df_unclean):
+        threshold = 0.7
+        features = [
+            'num_found_helpful',
+            'num_found_funny',
+            'total_game_hours',
+            'num_comments'
+        ]
 
+        df = df_unclean.dropna(subset=['found_helpful_percentage'], inplace=False)
+        X = df[features].copy()
+        y = (df['found_helpful_percentage'] >= threshold).astype(int)
 
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
 
-    # Your content for the PREDICTION page goes here
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
+
+        rf_model = RandomForestClassifier(
+            n_estimators=100,
+            max_depth=10,
+            min_samples_split=5,
+            random_state=42
+        )
+
+        rf_model.fit(X_train_scaled, y_train)
+        y_pred = rf_model.predict(X_test_scaled)
+
+        report = classification_report(y_test, y_pred, output_dict=False)
+
+        feature_importance = pd.DataFrame({
+            'feature': features,
+            'importance': rf_model.feature_importances_
+        }).sort_values('importance', ascending=False)
+
+        return rf_model, scaler
+
+    # Train model and scaler using the combined dataset
+    model, scaler = train_helpfulness_classifier(combined_df)
+
+    # User input for new data to predict
+    st.subheader("Helpful Review Classification")
+    num_found_helpful = st.number_input("Number of people who found the review helpful💡", min_value=0)
+    num_found_funny = st.number_input("Number of people who found the review funny😂", min_value=0)
+    total_game_hours = st.number_input("Total hours spent on the game⏳", min_value=0)
+    num_comments = st.number_input("Number of comments on the review💬", min_value=0)
+
+    new_review_data = pd.DataFrame({
+        'num_found_helpful': [num_found_helpful],
+        'num_found_funny': [num_found_funny],
+        'total_game_hours': [total_game_hours],
+        'num_comments': [num_comments]
+    })
+
+    # Prediction
+    if st.button("Predict Helpfulness"):
+        prediction = model.predict(scaler.transform(new_review_data))[0]
+        if prediction == 1:
+            st.success("Prediction: The review is likely to be marked as helpful.")
+        else:
+            st.info("Prediction: The review is less likely to be marked as helpful.")
 
 # Conclusions Page
 elif st.session_state.page_selection == "conclusion":
@@ -363,6 +431,10 @@ elif st.session_state.page_selection == "conclusion":
     st.subheader("Classification Model")
     st.write("""
      The classification model used the data groups: number of voted helpfulness, number of voted funny, total game hours, and number of comments to try and predict the helpfulness percentage of the review. According to the random forest classification the only data group that had significant impact was number of voted helpfulness, and the other data groups had little to no importance in the helpfulness percentage. Though the classification model still had a high accuracy percentage.
+            """)
+    st.subheader("Time Analysis Model")
+    st.write("""
+    The time analysis model analyzed the trends between the games using the dates when the review was posted and the total game hours of the reviewers.The trends were all decreasing which also points to the fact that these games were released at around 10 years ago so after their initial spike and popularity, the reviews are slowing down. But it is still suprising that even after 5 years they are still getting reviews. The model can be used to try and predict the trends until now and it would show that the reviews are on a steady decline from its initial release.
             """)
     st.subheader("Time Analysis Model")
     st.write("""
