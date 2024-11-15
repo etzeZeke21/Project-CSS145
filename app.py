@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
+from PIL import Image
 
 
 #######################
@@ -302,48 +303,407 @@ elif st.session_state.page_selection == "machine_learning":
 
 # Decision Tree Classifier Explanation
 if st.session_state.page_selection == "machine_learning":
-    st.header("Decision Tree Classifier")
+    
+    
+    #1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+    # Classifier
+    st.header("1. Classifier")
 
-    # Display Explanation
+    # Classifier Display Explanation
     st.write("""
-    **Decision Tree Classifier** from Scikit-learn library is a machine learning algorithm that is used primarily for classification tasks.
-    Its goal is to categorize data points into specific classes. The process involves breaking down data into smaller subsets 
-    based on questions which creates a "Tree" structure with each node representing a decision point.
+    **Classifier**, according to C3.AI, is a machine learning algorithm used to categorize data inputs into specific categories, 
+    which gives great enterprise applications. Thry are trained using labeled data algorithms and that it employs complex methods 
+    from mathematics and statistics and uses it to generate predictions.
     """)
-    st.write("Reference: [Scikit-learn Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)")
+    st.write("Reference: [C3.AI Glossary about Data Science](https://c3.ai/glossary/data-science/classifier/)")
 
-    # Show Training Code (if relevant)
-    st.subheader("Training the Decision Tree Classifier")
-    st.code("""
-    dt_classifier = DecisionTreeClassifier(random_state=42)
-    dt_classifier.fit(X_train, y_train)
-    """)
+    # Show Training Code (Classifier)
+    st.subheader("Training the Classifier")
+    with st.expander("See Code for the Training of Classifier"):
+        st.code("""
+        class SteamReviewClassifier:
+        def __init__(self):
+            self.text_vectorizer = TfidfVectorizer(max_features=5000)
+            self.numeric_scaler = StandardScaler()
+            self.model = None
 
-    # Evaluation Code
+        def create_feature_pipeline(self):
+
+            numeric_features = ['review_quality_score', 'log_playtime',
+                            'found_helpful_percentage', 'has_significant_playtime']
+
+            text_transformer = ('text', self.text_vectorizer, 'processed_text')
+
+            numeric_transformer = ('numeric', self.numeric_scaler, numeric_features)
+
+            column_transformer = ColumnTransformer(
+                transformers=[text_transformer, numeric_transformer],
+                remainder='drop'
+            )
+
+            pipeline = Pipeline([
+                ('features', column_transformer),
+                ('classifier', LogisticRegression(max_iter=1000))
+            ])
+
+            return pipeline
+
+        def train(self, df):
+
+            prepared_df = prepare_data(df)
+
+            if len(prepared_df) == 0:
+                raise ValueError("No valid data remaining after preprocessing")
+
+            X = prepared_df[['processed_text', 'review_quality_score', 'log_playtime',
+                            'found_helpful_percentage', 'has_significant_playtime']]
+            y = prepared_df['rating_binary']
+
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+            self.model = self.create_feature_pipeline()
+            self.model.fit(X_train, y_train)
+
+            y_pred = self.model.predict(X_test)
+
+            print("\nClassification Report:")
+            print(classification_report(y_test, y_pred))
+
+            return X_test, y_test, y_pred
+
+        def predict(self, review_text, game_hours=0, helpful_votes=0,
+                    unhelpful_votes=0, helpful_percentage=0):
+
+            processed_text = text_processing(review_text)
+
+            if processed_text is None:
+                raise ValueError("Invalid review text")
+
+            total_votes = helpful_votes + unhelpful_votes
+            if total_votes > 0:
+                review_quality_score = helpful_votes / total_votes
+            else:
+                review_quality_score = 0.5
+
+            log_playtime = np.log1p(float(game_hours))
+            has_significant_playtime = float(game_hours > 2)
+
+            input_data = pd.DataFrame({
+                'processed_text': [processed_text],
+                'review_quality_score': [review_quality_score],
+                'log_playtime': [log_playtime],
+                'found_helpful_percentage': [helpful_percentage],
+                'has_significant_playtime': [has_significant_playtime]
+            }))
+        """)
+
+    # Evaluation Code (Classifier)
     st.subheader("Model Evaluation")
-    st.code("""
-    y_pred = dt_classifier.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    print(f'Accuracy: {accuracy * 100:.2f}%')
-    """)
-    st.write("**Accuracy:** 100%")
+    with st.expander("See Code for the Model Evaluation of Classifier"):
+        st.code("""
+        classifier = SteamReviewClassifier()
+    X_test, y_test, y_pred = classifier.train(combined_df)
 
-    # Feature Importance
+    conf_matrix = confusion_matrix(y_test, y_pred)
+
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues',
+                xticklabels=['Not Recommended', 'Recommended'],
+                yticklabels=['Not Recommended', 'Recommended'])
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
+    plt.title('Confusion Matrix')
+    plt.show()
+
+    labels = ['Not Recommended', 'Recommended']
+    actual_counts = [list(y_test).count(0), list(y_test).count(1)]
+    predicted_counts = [list(y_pred).count(0), list(y_pred).count(1)]
+
+    x = range(len(labels))
+
+    plt.figure(figsize=(8, 6))
+    plt.bar(x, actual_counts, width=0.4, label='Actual', color='b', align='center')
+    plt.bar([p + 0.4 for p in x], predicted_counts, width=0.4, label='Predicted', color='r', align='center')
+
+    plt.xlabel('Review Recommendation')
+    plt.ylabel('Count')
+    plt.title('Actual vs Predicted Review Recommendations')
+    plt.xticks([p + 0.2 for p in x], labels)
+    plt.legend()
+    plt.show()
+        """)
+
+    pic11 = Image.open('assets/pics/1.1.png')
+    st.image(pic11, caption='Confusion Matrix of Classifier')
+
+    st.write(" ")
+
+    pic12 = Image.open('assets/pics/1.2.png')
+    st.image(pic12, caption='Bar Chart of the Review Recommendation')
+    
+  
+
+
+    #2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
+    # Random Forest Classifier
+    st.header(" ")
+    st.header("2. Random Forest Classifier")
+
+    # Random Forest Classifier Display Explanation
+    st.write("""
+    **Random Forest Classifier**  is a machine learning technique that uses a number of Decision Trees. By selecting a random 
+    subset of the dataset and evaluating a random set of features at each split is how each tree is built. All the trees collectively 
+    produce an output during prediction. For classification problems, this is done through majority voting. However, for the 
+    regression, it is done by taking an average of all the outputs from the trees. This will go together with collective 
+    insight, because the more insightful the trees, the more reliable the predictions. It is said to have a higher accuracy in
+    predictions compared to Decision Tree Classifier.
+    """)
+    st.write("Reference: [Geeks for Geeks](https://www.geeksforgeeks.org/random-forest-algorithm-in-machine-learning/)")
+
+    # Show Training Code (Random Forest Classifier)
+    st.subheader("Training the Random Forest Classifier")
+    with st.expander("See Code for the Training of Random Forest Classifier"):
+        st.code("""
+        def train_helpfulness_classifier(df_unclean):
+
+        threshold = 0.7
+
+        features = [
+            'num_found_helpful',
+            'num_found_funny',
+            'total_game_hours',
+            'num_comments'
+        ]
+
+        df = df_unclean.dropna(subset=['found_helpful_percentage'], inplace=False)
+
+        X = df[features].copy()
+
+        y = (df['found_helpful_percentage'] >= threshold).astype(int)
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
+
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
+
+        rf_model = RandomForestClassifier(
+            n_estimators=100,
+            max_depth=10,
+            min_samples_split=5,
+            random_state=42
+        )
+
+        rf_model.fit(X_train_scaled, y_train)
+
+        y_pred = rf_model.predict(X_test_scaled)
+
+        report = classification_report(y_test, y_pred)
+
+        feature_importance = pd.DataFrame({
+            'feature': features,
+            'importance': rf_model.feature_importances_
+        }).sort_values('importance', ascending=False)
+
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x='importance', y='feature', data=feature_importance)
+        plt.title('Feature Importance for Review Helpfulness Prediction')
+        plt.tight_layout()
+        plt.show()
+
+        plt.figure(figsize=(8, 6))
+        cm = confusion_matrix(y_test, y_pred)
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+        plt.title('Confusion Matrix')
+        plt.ylabel('True Label')
+        plt.xlabel('Predicted Label')
+        plt.show()
+
+        return rf_model, scaler, report
+
+    def predict_helpfulness(model, scaler, new_data):
+
+        features = [
+            'num_found_helpful',
+            'num_found_funny',
+            'total_game_hours',
+            'num_comments'
+        ]
+
+        X_new = new_data[features].copy()
+        X_new = X_new.fillna(0)
+        X_new_scaled = scaler.transform(X_new)
+
+        return model.predict(X_new_scaled)
+        """)
+
+    # Evaluation Code (Random Forest Classifier)
+    st.subheader("Model Evaluation")
+    with st.expander("See Code for the Model Evaluation of Random Forest Classifier"):
+        st.code("""
+        model, scaler, report = train_helpfulness_classifier(combined_df)
+    print("Classification Report:")
+    print(report)
+
+    new_reviews = pd.DataFrame({
+        'num_found_helpful': [10],
+        'num_found_funny': [5],
+        'total_game_hours': [100],
+        'num_comments': [3]
+    })
+
+    predictions = predict_helpfulness(model, scaler, new_reviews)
+    #produces 1 or 0, helpful is 1 while not helpful is 0
+    print("\nPredicted helpful (1) or not helpful (0):", predictions)
+
+    print("\nClassification Report:")
+    print(report)
+        """)
+
+    # Feature Importance (Random Forest Classifier)
     st.subheader("Feature Importance")
     st.write("""
-    Upon running .feature_importances in the Decision Tree Classifier Model to check how each feature influences the model's decisions, 
-    it is clear that 'petal_length' holds the most influence with 89% importance, followed by 'petal_width' with 8.7% importance.
+    When the .feature_importance ran in the Random Forest Classifier model, it showed that 'num_found_helpful' has the highest importance
+    followed by 'total_game_hours', then 'num_found_funny', and lastly 'num_comments'. You can check the bar chart below the codes.
     """)
-    st.code("""
-    decision_tree_feature_importance = pd.Series(dt_classifier.feature_importances_, index=X_train.columns)
-    decision_tree_feature_importance
-    """)
+    with st.expander("See Code for the Feature Importance of Random Forest Classifier"):
+        st.code("""
+        feature_importance = pd.DataFrame({
+            'feature': features,
+            'importance': rf_model.feature_importances_
+        }).sort_values('importance', ascending=False)
 
-    # Plot Decision Tree
-    st.subheader("Decision Tree Classifier - Tree Plot")
-    fig, ax = plt.subplots(figsize=(12, 8))
-    plot_tree(dt_classifier, filled=True, feature_names=X_train.columns, class_names=["Setosa", "Versicolor", "Virginica"], ax=ax)
-    st.pyplot(fig)
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x='importance', y='feature', data=feature_importance)
+        plt.title('Feature Importance for Review Helpfulness Prediction')
+        plt.tight_layout()
+        plt.show()
+        """)
+
+
+    pic21 = Image.open('assets/pics/2.1.png')
+    st.image(pic21, caption='Bar Chart of the Feature Importance')
+
+    st.write(" ")
+
+    pic22 = Image.open('assets/pics/2.2.png')
+    st.image(pic22, caption='Confusion Matrix of Random Forest Classifier')
+
+
+
+
+
+    #3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+    # Linear Regression
+    st.header(" ")
+    st.header("3. Linear Regression")
+
+    # Linear Regression Display Explanation
+    st.write("""
+    **Linear Regression** is a type of supervised machine learning alogorithm by calculating the linear relationships between independent
+    and dependent variables by the use of linear equation, hence its name. It is used because of the notable strength of linear regression,
+    its interpretability. There are two main types of Linear Regression, Simple Linear Regression for only one independent feature, and
+    Multiple Linear Regression for features that is more than one.
+    """)
+    st.write("Reference: [Geek for Geeks](https://www.geeksforgeeks.org/ml-linear-regression/)")
+
+    # Show Training Code (Linear Regression)
+    st.subheader("Training the Linear Regression")
+    with st.expander("See Code for the Training of Linear Regression"):
+        st.code("""
+        def analyze_steam_reviews(df):
+
+        # Convert date columns to datetime
+        df['date_posted'] = pd.to_datetime(df['date_posted'])
+
+        # Create month-year column for aggregation
+        df['month_year'] = df['date_posted'].dt.to_period('M')
+
+        # Calculate monthly metrics
+        monthly_stats = pd.DataFrame({
+            'avg_game_hours': df.groupby('month_year')['total_game_hours'].mean(),
+            'review_count': df.groupby('month_year').size(),
+            'avg_helpfulness': df.groupby('month_year')['found_helpful_percentage'].mean(),
+            'positive_ratio': df.groupby('month_year')['rating'].apply(
+                lambda x: (x == 'Recommended').mean() * 100
+            )
+        }).reset_index()
+
+        # Convert period to datetime for plotting
+        monthly_stats['month_year'] = monthly_stats['month_year'].dt.to_timestamp()
+
+        # Create subplots for visualization
+        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+        fig.suptitle('Steam Reviews Time Series Analysis', fontsize=16)
+
+        # Plot 1: Average Game Hours Over Time
+        axes[0, 0].plot(monthly_stats['month_year'], monthly_stats['avg_game_hours'])
+        axes[0, 0].set_title('Average Game Hours Over Time')
+        axes[0, 0].set_xlabel('Date')
+        axes[0, 0].set_ylabel('Average Hours')
+        axes[0, 0].tick_params(axis='x', rotation=45)
+
+        # Plot 2: Review Volume Over Time
+        axes[0, 1].plot(monthly_stats['month_year'], monthly_stats['review_count'])
+        axes[0, 1].set_title('Number of Reviews Over Time')
+        axes[0, 1].set_xlabel('Date')
+        axes[0, 1].set_ylabel('Number of Reviews')
+        axes[0, 1].tick_params(axis='x', rotation=45)
+
+        # Plot 3: Average Helpfulness Score Over Time
+        axes[1, 0].plot(monthly_stats['month_year'], monthly_stats['avg_helpfulness'])
+        axes[1, 0].set_title('Average Helpfulness Score Over Time')
+        axes[1, 0].set_xlabel('Date')
+        axes[1, 0].set_ylabel('Average Helpfulness (%)')
+        axes[1, 0].tick_params(axis='x', rotation=45)
+
+        # Plot 4: Positive Review Ratio Over Time
+        axes[1, 1].plot(monthly_stats['month_year'], monthly_stats['positive_ratio'])
+        axes[1, 1].set_title('Positive Review Ratio Over Time')
+        axes[1, 1].set_xlabel('Date')
+        axes[1, 1].set_ylabel('Positive Reviews (%)')
+        axes[1, 1].tick_params(axis='x', rotation=45)
+
+        plt.tight_layout()
+        plt.show()
+
+        # Calculate correlation between game hours and other metrics
+        correlations = pd.DataFrame({
+            'Metric': ['Helpfulness Score', 'Positive Rating'],
+            'Correlation with Game Hours': [
+                df['total_game_hours'].corr(df['found_helpful_percentage']),
+                df['total_game_hours'].corr(df['rating'].map({'Recommended': 1, 'Not Recommended': 0}))
+            ]
+        })
+
+        # Calculate trend statistics
+        trend_stats = {
+            'avg_hours_trend': np.polyfit(range(len(monthly_stats)), monthly_stats['avg_game_hours'], 1)[0],
+            'helpfulness_trend': np.polyfit(range(len(monthly_stats)), monthly_stats['avg_helpfulness'], 1)[0],
+            'sentiment_trend': np.polyfit(range(len(monthly_stats)), monthly_stats['positive_ratio'], 1)[0]
+        }
+
+        return monthly_stats, correlations, trend_stats
+        """)
+
+    # Evaluation Code (Linear Regression)
+    st.subheader("Model Evaluation")
+    with st.expander("See Code for the Model Evaluation of Linear Regression"):
+        st.code("""
+    monthly_stats, correlations, trend_stats = analyze_steam_reviews(combined_df)
+
+    print("\nCorrelations with Game Hours:")
+    print(correlations)
+    print("\nTrend Analysis:")
+    print(f"Average Hours Trend: {'Increasing' if trend_stats['avg_hours_trend'] > 0 else 'Decreasing'}")
+    print(f"Helpfulness Score Trend: {'Increasing' if trend_stats['helpfulness_trend'] > 0 else 'Decreasing'}")
+    print(f"Positive Review Ratio Trend: {'Increasing' if trend_stats['sentiment_trend'] > 0 else 'Decreasing'}")
+        """)
+
+    pic31 = Image.open('assets/pics/3.1.png')
+    st.image(pic31, caption='Multiple Line Graphs of Steam Reviews Time Series Analysis')
 
 
 
