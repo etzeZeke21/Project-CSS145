@@ -113,7 +113,11 @@ else:
 if st.session_state.page_selection == "about":
     st.header("ℹ️ About")
 
-    # Your content for the ABOUT page goes here
+    st.write("""
+            This Streamlit Application is a Final Project in the course CSS145 Introduction to Data Science.
+            
+             """)
+    
 
 # Dataset Page
 elif st.session_state.page_selection == "dataset":
@@ -263,7 +267,7 @@ elif st.session_state.page_selection == "eda":
     # Caption
     st.write("""
     **Interpretation:** This word cloud shows frequently mentioned words in reviews. Common words can reveal popular topics or 
-    frequent concerns among players, such as gameplay, performance, or features. Positive or negative words can indicate the 
+    frequent concerns among players, such as game, fun, or play. Positive or negative words can indicate the 
     general sentiment.
     """)
 
@@ -338,4 +342,16 @@ elif st.session_state.page_selection == "prediction":
 elif st.session_state.page_selection == "conclusion":
     st.header("📝 Conclusion")
 
-    # Your content for the CONCLUSION page goes here
+
+    st.subheader("Sentimental Analysis")
+    st.write("""
+    The sentimental analysis model showed great results in predicting the review text if the review was recommended or not. By adding a few more data it could be used to differentiate which reviews are useful or helpful for other players that may seek information about the game.
+    """)
+    st.subheader("Classification Model")
+    st.write("""
+     The classification model used the data groups: number of voted helpfulness, number of voted funny, total game hours, and number of comments to try and predict the helpfulness percentage of the review. According to the random forest classification the only data group that had significant impact was number of voted helpfulness, and the other data groups had little to no importance in the helpfulness percentage. Though the classification model still had a high accuracy percentage.
+            """)
+    st.subheader("Time Analysis Model")
+    st.write("""
+    The time analysis model analyzed the trends between the games using the dates when the review was posted and the total game hours of the reviewers.The trends were all decreasing which also points to the fact that these games were released at around 10 years ago so after their initial spike and popularity, the reviews are slowing down. But it is still suprising that even after 5 years they are still getting reviews. The model can be used to try and predict the trends until now and it would show that the reviews are on a steady decline from its initial release.
+            """)
